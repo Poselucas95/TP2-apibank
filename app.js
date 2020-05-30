@@ -3,7 +3,7 @@ var app = express();
 const port = 8080;
 
 app.get("/", (req, res) => {
-  res.status(200).send("Bienvenido a la aplicación del banco.");
+  res.status(200).send("Bienvenido a apibank v0.1");
 });
 
 
