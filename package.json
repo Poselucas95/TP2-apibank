@@ -1,25 +1,16 @@
 {
-  "name": "apibank",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "tp2-apibank",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node ./bin/www"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Poselucas95/TP2-apibank.git"
-  },
-  "author": "Lucas Pose - Julian Luco",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Poselucas95/TP2-apibank/issues"
-  },
-  "homepage": "https://github.com/Poselucas95/TP2-apibank#readme",
   "dependencies": {
-    "chalk": "^4.0.0",
-    "express": "^4.17.1",
-    "mongodb": "^3.5.7"
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1"
   }
 }
