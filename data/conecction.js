@@ -1,7 +1,8 @@
 const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://odin:nido@cluster0-eyuyd.gcp.mongodb.net/test?retryWrites=true&w=majority";
+const dotenv = require('dotenv');
+dotenv.config();
 
-
+const uri = process.env.MONGODB;
 const client = new MongoClient(uri, {useUnifiedTopology: true, useNewUrlParser: true});
 
 async function getConnection(){
