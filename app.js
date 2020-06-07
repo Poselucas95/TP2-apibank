@@ -28,14 +28,14 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api/users', usersRouter);
 
 //agregados ->
-app.use('/clientes', clientesRouter);
-app.use('/cuentas', cuentasRouter);
-app.use('/creditos', creditosRouter);
-app.use('/debitos', debitosRouter);
-app.use('/movimientos', movimientosRouter);
+app.use('/api/clientes', clientesRouter);
+app.use('/api/cuentas', cuentasRouter);
+app.use('/api/creditos', creditosRouter);
+app.use('/api/debitos', debitosRouter);
+app.use('/api/movimientos', movimientosRouter);
 
 
 
