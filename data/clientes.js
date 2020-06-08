@@ -1,5 +1,6 @@
 const db = require("./conecction");
-var _ = require("lodash");
+const _ = require("lodash");
+const validator = require("validator").default;
 
 async function getClients() {
   var clientmongo = await db.getConnection();
@@ -25,6 +26,7 @@ async function newClient(values) {
   const params = [
     "person_id",
     "name",
+    "salary",
     "surname",
     "adress",
     "email",
@@ -51,51 +53,62 @@ async function newClient(values) {
     return 2;
   }
 
-  var auxParams = [];
-  Object.entries(values).forEach((res) => {
-    if (params.includes(res[0])) {
-      var a = res[0];
-      auxParams.push();
-    }
+  if (
+    !validator.isEmpty(values.name) ||
+    !validator.isInt(values.person_id) ||
+    salary < 0 ||
+    !validator.isEmpty(values.surname) ||
+    !validator.isEmpty(values.adress) ||
+    !validator.isEmpty(values.password) ||
+    !validator.isEmpty(values.email)
+  ) {
+    return 3;
+  }
+
+  if (!validator.isEmail(values.email)) {
+    return 4;
+  }
+  if (!validator.isInt(values.person_id, { min: 7, max: 8 })) {
+    return 5;
+  }
+  if (!validator.isLength(values.password, { min: 4, max: 10 })) {
+    return 6;
+  }
+
+  var clientId = await clientmongo
+    .db("apibank")
+    .collection("cuentas")
+    .find()
+    .sort({ $natural: -1 })
+    .limit(1)
+    .toArray();
+
+  var encryptedPass = "";
+  bcrypt.hash(values.password, 10, function (err, hash) {
+    encryptedPass = hash;
   });
 
-  console.log(auxParams);
-
-  return 1;
+  await clientmongo
+    .db("apibank")
+    .collection("clientes")
+    .insertOne({
+      client_id: clientId[0].client_id,
+      person_id: values.person_id,
+      salary: values.salary,
+      name: values.name,
+      surname: values.surname,
+      adress: values.adress,
+      email: values.email,
+      password: encryptedPass,
+    })
+    .then((res) => {
+      console.log(chalk.green(`Se insertó ${res.insertedCount} cliente`));
+      return 0;
+    })
+    .catch((err) => {
+      console.log(chalk.red(err));
+      return -1
+    });
 }
 
 module.exports = { getClients, getClient, newClient };
-
-/* .insertOne(object)
-        .then((res) => {
-          console.log(chalk.green(`Se insertó ${res.insertedCount} inventor`));
-          return res;
-        })
-        .catch((err) => {
-          console.log(chalk.red(err));
-        });
-    })
-    .catch((err) => console.log(chalk.red(err)));
- */
-/* 
-var collection = await clientmongo
-.db("apibank")
-.collection("cuentas")
-.find()
-.sort({ $natural: -1 })
-.limit(1)
-.toArray(); */
-
-/* 
-client_id: 100001,
-person_id: 22432311,
-salary: 1000000,
-name: "Marcos",
-surname: "Galperin",
-address: "Arias 3751, 7, Capital Federal (1430), Capital Federal, Argentina",
-email: "marcos@meli.com",
-password: "$2b$12$YjMZPFrj1qS6I/Zy1bxlgOV402ijFcNE.6YVueL5FoWK3eE/QVgKu",
-accounts: [
-111111,
-111112
-] */

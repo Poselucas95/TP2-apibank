@@ -25,15 +25,38 @@ router.get("/:dni?", async function (req, res, next) {
 router.post("/", async function (req, res, next) {
   var newClient = await dataClientes.newClient(req.body);
 
-  if(Array.isArray(newClient)){
-    res.send(`The following parameters are missing: ${newClient}`, 400)
-  }
+  /*
+  Errores: 2 - Ya existe el cliente. 3 - Se ingresaron parametros incorrectos. 4 - Email invalido. 5- El person id no es un int entre 7 y 8 caracteres [] - Faltan parametros por completar
+  */
 
-  if(newClient === 2){
-    res.send('The client allready exits', 400)
+  switch (newClient) {
+    case Array.isArray(newClient):
+      res.send(`The following parameters are missing: ${newClient}`, 400);
+      break;
+    case 2:
+      res.send("The client allready exits", 400);
+      break;
+    case 3:
+      res.send("Error: Entering empty parameters", 400);
+      break;
+    case 4:
+      res.send("Error: Email invalid", 400);
+      break;
+    case 5:
+      res.send("Error: person id must be between 7 and 8 characters", 400);
+      break;
+    case 6:
+      res.send(
+        "Error: password must Error: The password must be between 4 and 10 characters "
+      );
+      break;
+    case 0:
+      res.send("Ok", 200);
+      break;
+    case -1:
+      res.send("Couldn't create the client", 400);
+      break;
   }
-
-  res.send('ok', 200)
 });
 
 module.exports = router;
