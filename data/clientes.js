@@ -1,6 +1,8 @@
 const db = require("./conecction");
 const _ = require("lodash");
 const validator = require("validator").default;
+const bcrypt = require('bcrypt');
+const chalk = require('chalk')
 
 async function getClients() {
   var clientmongo = await db.getConnection();
@@ -28,7 +30,7 @@ async function newClient(values) {
     "name",
     "salary",
     "surname",
-    "adress",
+    "address",
     "email",
     "password",
   ];
@@ -54,13 +56,13 @@ async function newClient(values) {
   }
 
   if (
-    !validator.isEmpty(values.name) ||
-    !validator.isInt(values.person_id) ||
-    salary < 0 ||
-    !validator.isEmpty(values.surname) ||
-    !validator.isEmpty(values.adress) ||
-    !validator.isEmpty(values.password) ||
-    !validator.isEmpty(values.email)
+    validator.isEmpty(values.name) ||
+    values.person_id < 0 ||
+    values.salary < 0 ||
+    validator.isEmpty(values.surname) ||
+    validator.isEmpty(values.address) ||
+    validator.isEmpty(values.password) ||
+    validator.isEmpty(values.email)
   ) {
     return 3;
   }
@@ -68,7 +70,7 @@ async function newClient(values) {
   if (!validator.isEmail(values.email)) {
     return 4;
   }
-  if (!validator.isInt(values.person_id, { min: 7, max: 8 })) {
+  if (values.person_id.length < 7 || values.person_id.length > 8) {
     return 5;
   }
   if (!validator.isLength(values.password, { min: 4, max: 10 })) {
@@ -97,18 +99,20 @@ async function newClient(values) {
       salary: values.salary,
       name: values.name,
       surname: values.surname,
-      adress: values.adress,
+      address: values.address,
       email: values.email,
       password: encryptedPass,
     })
     .then((res) => {
       console.log(chalk.green(`Se insertó ${res.insertedCount} cliente`));
-      return 0;
+      return 7;
     })
     .catch((err) => {
       console.log(chalk.red(err));
-      return -1
+      return -1;
     });
+
+    return 7
 }
 
 module.exports = { getClients, getClient, newClient };
