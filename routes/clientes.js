@@ -1,11 +1,8 @@
 var express = require("express");
 var router = express.Router();
 var dataClientes = require("../data/clientes");
-var bodyParser = require("body-parser");
-var app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+
 
 /* GET clientes listing. */
 router.get("/:dni?", async function (req, res, next) {
@@ -29,10 +26,11 @@ router.post("/", async function (req, res, next) {
   Errores: 2 - Ya existe el cliente. 3 - Se ingresaron parametros incorrectos. 4 - Email invalido. 5- El person id no es un int entre 7 y 8 caracteres [] - Faltan parametros por completar
   */
 
+  if(Array.isArray(newClient)){
+    res.send(`The following parameters are missing: ${newClient}`, 400);
+  }
+
   switch (newClient) {
-    case Array.isArray(newClient):
-      res.send(`The following parameters are missing: ${newClient}`, 400);
-      break;
     case 2:
       res.send("The client allready exits", 400);
       break;
@@ -50,7 +48,7 @@ router.post("/", async function (req, res, next) {
         "Error: password must Error: The password must be between 4 and 10 characters "
       );
       break;
-    case 0:
+    case 7:
       res.send("Ok", 200);
       break;
     case -1:
