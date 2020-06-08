@@ -1,8 +1,10 @@
 const db = require("./conecction");
 const _ = require("lodash");
 const validator = require("validator").default;
-const bcrypt = require('bcrypt');
-const chalk = require('chalk')
+const chalk = require("chalk");
+
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 async function getClients() {
   var clientmongo = await db.getConnection();
@@ -79,29 +81,28 @@ async function newClient(values) {
 
   var clientId = await clientmongo
     .db("apibank")
-    .collection("cuentas")
+    .collection("clientes")
     .find()
     .sort({ $natural: -1 })
     .limit(1)
     .toArray();
 
-  var encryptedPass = "";
-  bcrypt.hash(values.password, 10, function (err, hash) {
-    encryptedPass = hash;
-  });
+  const salt = bcrypt.genSaltSync(saltRounds);
+  const hash = bcrypt.hashSync(values.password, salt);
 
   await clientmongo
     .db("apibank")
     .collection("clientes")
     .insertOne({
-      client_id: clientId[0].client_id,
+      client_id: clientId[0].client_id + 1,
       person_id: values.person_id,
       salary: values.salary,
       name: values.name,
       surname: values.surname,
       address: values.address,
       email: values.email,
-      password: encryptedPass,
+      password: hash,
+      accounts: [],
     })
     .then((res) => {
       console.log(chalk.green(`Se insertó ${res.insertedCount} cliente`));
@@ -112,7 +113,7 @@ async function newClient(values) {
       return -1;
     });
 
-    return 7
+  return 7;
 }
 
 module.exports = { getClients, getClient, newClient };
