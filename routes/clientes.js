@@ -2,9 +2,7 @@ var express = require("express");
 var router = express.Router();
 var dataClientes = require("../data/clientes");
 
-
-
-/* GET clientes listing. */
+// GET clientes
 router.get("/:dni?", async function (req, res, next) {
   if (req.params.dni) {
     var client = await dataClientes.getClient(req.params.dni);
@@ -19,6 +17,7 @@ router.get("/:dni?", async function (req, res, next) {
   }
 });
 
+// POST client
 router.post("/", async function (req, res, next) {
   var newClient = await dataClientes.newClient(req.body);
 
@@ -26,7 +25,7 @@ router.post("/", async function (req, res, next) {
   Errores: 2 - Ya existe el cliente. 3 - Se ingresaron parametros incorrectos. 4 - Email invalido. 5- El person id no es un int entre 7 y 8 caracteres [] - Faltan parametros por completar
   */
 
-  if(Array.isArray(newClient)){
+  if (Array.isArray(newClient)) {
     res.send(`The following parameters are missing: ${newClient}`, 400);
   }
 
@@ -54,6 +53,25 @@ router.post("/", async function (req, res, next) {
     case -1:
       res.send("Couldn't create the client", 400);
       break;
+  }
+});
+
+// UPDATE cliente
+// POST client
+router.post("/:dni", async function (req, res, next) {
+  var updateClient = await dataClientes.updateClient(req.params.dni, req.body);
+
+  switch (updateClient) {
+    case 0:
+      res.send("The client not found", 400);
+      break;
+    case 1:
+      res.send("The new salary is incorrect", 400);
+      break;
+  }
+
+  if (Array.isArray(updateClient)) {
+    res.send(updateClient, 200);
   }
 });
 

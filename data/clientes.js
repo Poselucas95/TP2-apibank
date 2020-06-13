@@ -116,4 +116,55 @@ async function newClient(values) {
   return 7;
 }
 
-module.exports = { getClients, getClient, newClient };
+async function updateClient(dni, values) {
+  var clientmongo = await db.getConnection();
+  var client = await clientmongo
+    .db("apibank")
+    .collection("clientes")
+    .find({ person_id: parseInt(dni) })
+    .toArray();
+
+  if (client && client.length !== 1) {
+    return 0;
+  }
+  if (values.salary && values.salary < 0) {
+    return 1;
+  }
+
+  var updateObject = {};
+  if (values.salary) {
+    updateObject.salary = values.salary;
+  }
+  if (!validator.isEmpty(values.address)) {
+    updateObject.address = values.address;
+  }
+  if (validator.isEmail(values.email)) {
+    updateObject.email = values.email;
+  }
+  if (validator.isLength(values.password, { min: 4, max: 10 })) {
+    var salt = bcrypt.genSaltSync(saltRounds);
+    var hash = bcrypt.hashSync(values.password, salt);
+    updateObject.password = hash;
+  }
+
+  await clientmongo
+    .db("apibank")
+    .collection("clientes")
+    .updateOne({ person_id: client.person_id }, { $set: updateObject })
+    .then((res) => {
+      console.log(chalk.green(`Se modificó ${res.modifiedCount} registro`));
+    })
+    .catch((err) => {
+      chalk.red("No se logro editar al cliente", err);
+    });
+
+  var newUpdateClient = await clientmongo
+    .db("apibank")
+    .collection("clientes")
+    .find({ person_id: parseInt(dni) })
+    .toArray();
+
+  return newUpdateClient;
+}
+
+module.exports = { getClients, getClient, newClient, updateClient };
