@@ -81,7 +81,7 @@ async function newClient(values) {
 
   var clientId = await clientmongo
     .db("apibank")
-    .collection("clientes")
+    .collection("client_id")
     .find()
     .sort({ $natural: -1 })
     .limit(1)
@@ -112,6 +112,14 @@ async function newClient(values) {
       console.log(chalk.red(err));
       return -1;
     });
+
+    await clientmongo
+    .db("apibank")
+    .collection("client_id")
+    .insertOne({
+      client_id: clientId[0].client_id + 1,
+    });
+
 
   return 7;
 }
