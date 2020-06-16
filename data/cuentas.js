@@ -129,4 +129,33 @@ async function updateAccount(acc, values) {
 
 }
 
-module.exports = { getAccounts, newAccount, updateAccount };
+
+async function deleteAccount(accountId) {
+  var clientmongo = await db.getConnection();
+  var account = await clientmongo
+    .db("apibank")
+    .collection("cuentas")
+    .find({ person_id: parseInt(accountId) })
+    .toArray();
+
+    if(account && account.length !== 1){
+      return 1
+    }
+
+    if(account[0].balance === 0){
+      await clientmongo.db("apibank").collection("cuentas").deleteOne(account[0])
+      .then((res) => {
+        console.log(chalk.green("Se ha eliminado la cuenta: ", res));
+        return 3
+      })
+      .catch((err) => {
+        chalk.red("No se logro eliminar la cuenta ", err);
+        return 2
+      });
+    }else{
+      return 2
+    }
+
+}
+
+module.exports = { getAccounts, newAccount, updateAccount, deleteAccount };

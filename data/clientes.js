@@ -175,4 +175,41 @@ async function updateClient(dni, values) {
   return newUpdateClient;
 }
 
-module.exports = { getClients, getClient, newClient, updateClient };
+async function deleteClient(dni) {
+  var clientmongo = await db.getConnection();
+  var client = await clientmongo
+    .db("apibank")
+    .collection("clientes")
+    .find({ person_id: parseInt(dni) })
+    .toArray();
+
+    if(client && client.length !== 1){
+      return 1
+    }
+
+    for (const element of client[0].accounts) {
+      var acc = await clientmongo
+        .db("apibank")
+        .collection("cuentas")
+        .find({ account_id: element })
+        .toArray();
+      if (acc && acc.length === 1) {
+        if(acc[0].balance !== 0){
+          return 2
+        }
+      }
+    }
+
+    await clientmongo.db("apibank").collection("clientes").deleteOne(client[0])
+    .then((res) => {
+      console.log(chalk.green("Se ha eliminado el cliente: ", res));
+      return 3
+    })
+    .catch((err) => {
+      chalk.red("No se logro eliminar el cliente ", err);
+      return 2
+    });
+}
+
+
+module.exports = { getClients, getClient, newClient, updateClient, deleteClient };

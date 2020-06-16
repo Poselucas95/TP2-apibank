@@ -44,5 +44,19 @@ router.put("/:account", async function (req, res, next){
     }
 })
 
+// DELETE Cuenta
+router.delete("/:accountId", async function (req, res, next){
+  var deleteAccount = await dataCuentas.deleteAccount(req.params.dni);
+
+  if(deleteAccount === 1){
+    res.send("Account not found", 404)
+  }
+  if(deleteAccount === 2){
+    res.send("Couldn't delete the account", 400)
+  }
+  if(deleteAccount === 3){
+    res.send("Ok", 200)
+  }
+})
 
 module.exports = router;

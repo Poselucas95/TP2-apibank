@@ -21,10 +21,6 @@ router.get("/:dni?", async function (req, res, next) {
 router.post("/", async function (req, res, next) {
   var newClient = await dataClientes.newClient(req.body);
 
-  /*
-  Errores: 2 - Ya existe el cliente. 3 - Se ingresaron parametros incorrectos. 4 - Email invalido. 5- El person id no es un int entre 7 y 8 caracteres [] - Faltan parametros por completar
-  */
-
   if (Array.isArray(newClient)) {
     res.send(`The following parameters are missing: ${newClient}`, 400);
   }
@@ -57,8 +53,7 @@ router.post("/", async function (req, res, next) {
 });
 
 // UPDATE cliente
-// POST client
-router.post("/:dni", async function (req, res, next) {
+router.put("/:dni", async function (req, res, next) {
   var updateClient = await dataClientes.updateClient(req.params.dni, req.body);
 
   switch (updateClient) {
@@ -74,5 +69,20 @@ router.post("/:dni", async function (req, res, next) {
     res.send(updateClient, 200);
   }
 });
+
+// DELETE cliente
+router.delete("/:dni", async function (req, res, next){
+  var deleteClient = await dataClientes.deleteClient(req.params.dni);
+
+  if(deleteClient === 1){
+    res.send("Client not found", 404)
+  }
+  if(deleteClient === 2){
+    res.send("Couldn't delete the client", 400)
+  }
+  if(deleteClient === 3){
+    res.send("Ok", 200)
+  }
+})
 
 module.exports = router;
