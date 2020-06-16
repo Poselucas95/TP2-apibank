@@ -113,13 +113,12 @@ async function newClient(values) {
       return -1;
     });
 
-    await clientmongo
+  await clientmongo
     .db("apibank")
     .collection("client_id")
     .insertOne({
       client_id: clientId[0].client_id + 1,
     });
-
 
   return 7;
 }
@@ -183,33 +182,53 @@ async function deleteClient(dni) {
     .find({ person_id: parseInt(dni) })
     .toArray();
 
-    if(client && client.length !== 1){
-      return 1
-    }
+  if (client && client.length !== 1) {
+    return 1;
+  }
 
-    for (const element of client[0].accounts) {
-      var acc = await clientmongo
-        .db("apibank")
-        .collection("cuentas")
-        .find({ account_id: element })
-        .toArray();
-      if (acc && acc.length === 1) {
-        if(acc[0].balance !== 0){
-          return 2
-        }
+  for (const element of client[0].accounts) {
+    var acc = await clientmongo
+      .db("apibank")
+      .collection("cuentas")
+      .find({ account_id: element })
+      .toArray();
+    if (acc && acc.length === 1) {
+      if (acc[0].balance !== 0) {
+        return 2;
       }
     }
+  }
+  for (const element of account[0].accounts) {
+    await clientmongo
+      .db("apibank")
+      .collection("cuentas")
+      .deleteOne({ account_id: element })
+      .then((res) => {
+        console.log(chalk.green("Se ha eliminado la cuenta: ", res));
+      })
+      .catch((err) => {
+        chalk.red("No se logro eliminar la cuenta ", err);
+      });
+  }
 
-    await clientmongo.db("apibank").collection("clientes").deleteOne(client[0])
+  await clientmongo
+    .db("apibank")
+    .collection("clientes")
+    .deleteOne(client[0])
     .then((res) => {
       console.log(chalk.green("Se ha eliminado el cliente: ", res));
-      return 3
+      return 3;
     })
     .catch((err) => {
       chalk.red("No se logro eliminar el cliente ", err);
-      return 2
+      return 2;
     });
 }
 
-
-module.exports = { getClients, getClient, newClient, updateClient, deleteClient };
+module.exports = {
+  getClients,
+  getClient,
+  newClient,
+  updateClient,
+  deleteClient,
+};
