@@ -9,13 +9,13 @@ router.post("/:alias", async function (req, res, next){
   if(newCredit === 1){
     res.send("Account not found", 404)
   }
-  if(newAccount === 2){
+  if(newCredit === 2){
     res.send("The reason is null", 400)
   }
-  if(newAccount === 3){
+  if(newCredit === 3){
     res.send("The ammout must be above 0", 400)
   }
-  if(newAccount === 4){
+  if(newCredit === 4){
     res.send("Transaction added correctly", 200)
   }
 })
