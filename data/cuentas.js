@@ -119,13 +119,13 @@ async function updateAccount(acc, values) {
     }
     await clientmongo.db("apibank").collection("cuentas").updateOne({ account_id: account[0].account_id }, { $set: { alias: values.alias }}).then(res => {
       console.log(chalk.green(`Se modificó ${res.modifiedCount} registro`));
-      return 2;
+      return 1;
     }).catch(err => {
       chalk.red("No se logro editar la cuenta", err);
     })
   }
 
-  return 1;
+  return 2;
 
 }
 
