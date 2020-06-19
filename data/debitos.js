@@ -14,7 +14,7 @@ async function newDebit(alias, values) {
   if (!values.amount || values.amount < 0) {
     return 3;
   }
-
+  var clientmongo = await db.getConnection();
   var account = await clientmongo
     .db("apibank")
     .collection("cuentas")

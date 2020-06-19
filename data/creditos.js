@@ -15,6 +15,7 @@ async function newCredit(alias, values) {
     return 3;
   }
 
+  var clientmongo = await db.getConnection();
   var account = await clientmongo
     .db("apibank")
     .collection("cuentas")
