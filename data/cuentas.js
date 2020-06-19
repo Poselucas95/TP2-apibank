@@ -55,7 +55,7 @@ async function newAccount(dni, values) {
     }
     var lastAccount = await clientmongo
       .db("apibank")
-      .collection("cuentas")
+      .collection("acc_id")
       .find()
       .sort({ $natural: -1 })
       .limit(1)
@@ -95,6 +95,13 @@ async function newAccount(dni, values) {
         transactions: []
       });
 
+      await clientmongo
+      .db("apibank")
+      .collection("acc_id")
+      .insertOne({
+        account_id: lastAccount[0].account_id + 1,
+      });
+
       return 0
   }
 }
@@ -126,7 +133,6 @@ async function updateAccount(acc, values) {
   }
 
   return 2;
-
 }
 
 
