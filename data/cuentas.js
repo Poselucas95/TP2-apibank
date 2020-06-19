@@ -21,7 +21,6 @@ async function getAccounts(dni) {
         .collection("cuentas")
         .find({ account_id: element })
         .toArray();
-      c;
       if (acc && acc.length === 1) {
         accountsArray.push(acc[0]);
       }
