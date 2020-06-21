@@ -6,6 +6,7 @@ const chalk = require("chalk");
 async function newCredit(alias, values) {
   if (
     !values.reason ||
+    typeof values.reason !== "string" ||
     validator.isEmpty(values.reason) ||
     values.reason.length < 2
   ) {
@@ -38,9 +39,10 @@ async function newCredit(alias, values) {
   var accountTransaction = await clientmongo
     .db("apibank")
     .collection("transacciones")
-    .find({ account_id: parseInt(account[0].account_id) }).toArray();
+    .find({ account_id: parseInt(account[0].account_id) })
+    .toArray();
 
-    console.log(accountTransaction[0])
+  console.log(accountTransaction[0]);
   await clientmongo
     .db("apibank")
     .collection("transacciones")

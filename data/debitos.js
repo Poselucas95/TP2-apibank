@@ -5,7 +5,7 @@ const chalk = require("chalk");
 
 async function newDebit(alias, values) {
   if (
-    !values.reason ||
+    !values.reason || typeof values.reason !== "string" ||
     validator.isEmpty(values.reason) ||
     values.reason.length < 2
   ) {
