@@ -38,8 +38,9 @@ async function newCredit(alias, values) {
   var accountTransaction = await clientmongo
     .db("apibank")
     .collection("transacciones")
-    .find({ account_id: account[0].account_id });
+    .find({ account_id: parseInt(account[0].account_id) }).toArray();
 
+    console.log(accountTransaction[0])
   await clientmongo
     .db("apibank")
     .collection("transacciones")
