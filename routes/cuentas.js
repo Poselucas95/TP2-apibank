@@ -39,6 +39,9 @@ router.put("/:account", async function (req, res, next){
     if(updateAccount === 1){
       res.send("Error", 400)
     }
+    if(updateAccount === 3){
+      res.send("Alias is already exists", 404)
+    }
     if(updateAccount === 2 ){
       res.send("Update complete", 200)
     }
@@ -46,7 +49,7 @@ router.put("/:account", async function (req, res, next){
 
 // DELETE Cuenta
 router.delete("/:accountId", async function (req, res, next){
-  var deleteAccount = await dataCuentas.deleteAccount(req.params.dni);
+  var deleteAccount = await dataCuentas.deleteAccount(req.params.accountId);
 
   if(deleteAccount === 1){
     res.send("Account not found", 404)

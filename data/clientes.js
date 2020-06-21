@@ -46,22 +46,13 @@ async function newClient(values) {
     return dif;
   }
 
-  var clientmongo = await db.getConnection();
-  var cli = await clientmongo
-    .db("apibank")
-    .collection("clientes")
-    .find({ person_id: parseInt(values.person_id) })
-    .toArray();
-
-  if (cli.length > 0) {
-    return 2;
-  }
-
   if (
     typeof values.name !== "string" ||
     typeof values.address !== "string" ||
     typeof values.password !== "string" ||
     typeof values.email !== "string" ||
+    typeof values.person_id !== "number" ||
+    typeof values.salary !== "number" ||
     validator.isEmpty(values.name) ||
     values.person_id < 0 ||
     values.salary < 0 ||
@@ -71,6 +62,17 @@ async function newClient(values) {
     validator.isEmpty(values.email)
   ) {
     return 3;
+  }
+
+  var clientmongo = await db.getConnection();
+  var cli = await clientmongo
+    .db("apibank")
+    .collection("clientes")
+    .find({ person_id: parseInt(values.person_id) })
+    .toArray();
+
+  if (cli.length > 0) {
+    return 2;
   }
 
   if (!validator.isEmail(values.email)) {
@@ -146,13 +148,16 @@ async function updateClient(dni, values) {
   if (values.salary) {
     updateObject.salary = values.salary;
   }
-  if (!validator.isEmpty(values.address)) {
+  if (values.address && !validator.isEmpty(values.address)) {
     updateObject.address = values.address;
   }
-  if (validator.isEmail(values.email)) {
+  if (values.email && validator.isEmail(values.email)) {
     updateObject.email = values.email;
   }
-  if (validator.isLength(values.password, { min: 4, max: 10 })) {
+  if (
+    values.password &&
+    validator.isLength(values.password, { min: 4, max: 10 })
+  ) {
     var salt = bcrypt.genSaltSync(saltRounds);
     var hash = bcrypt.hashSync(values.password, salt);
     updateObject.password = hash;
@@ -161,7 +166,7 @@ async function updateClient(dni, values) {
   await clientmongo
     .db("apibank")
     .collection("clientes")
-    .updateOne({ person_id: client.person_id }, { $set: updateObject })
+    .updateOne({ person_id: client[0].person_id }, { $set: updateObject })
     .then((res) => {
       console.log(chalk.green(`Se modificó ${res.modifiedCount} registro`));
     })
@@ -190,29 +195,26 @@ async function deleteClient(dni) {
     return 1;
   }
 
-  for (const element of client[0].accounts) {
-    var acc = await clientmongo
-      .db("apibank")
-      .collection("cuentas")
-      .find({ account_id: element })
-      .toArray();
-    if (acc && acc.length === 1) {
-      if (acc[0].balance !== 0) {
-        return 2;
+  if (client[0].accounts) {
+    for (const element of client[0].accounts) {
+      var acc = await clientmongo
+        .db("apibank")
+        .collection("cuentas")
+        .find({ account_id: element })
+        .toArray();
+      if (acc && acc.length === 1) {
+        if (acc[0].balance !== 0) {
+          return 2;
+        }
       }
     }
-  }
-  for (const element of account[0].accounts) {
-    await clientmongo
-      .db("apibank")
-      .collection("cuentas")
-      .deleteOne({ account_id: element })
-      .then((res) => {
-        console.log(chalk.green("Se ha eliminado la cuenta: ", res));
-      })
-      .catch((err) => {
-        chalk.red("No se logro eliminar la cuenta ", err);
-      });
+
+    for (const element of client[0].accounts) {
+      await clientmongo
+        .db("apibank")
+        .collection("cuentas")
+        .deleteOne({ account_id: element })
+    }
   }
 
   await clientmongo

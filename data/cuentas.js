@@ -114,6 +114,7 @@ async function updateAccount(acc, values) {
     .find({ account_id: parseInt(acc) })
     .toArray();
 
+    console.log(acc)
   if (account && account.length !== 1) {
     return 0;
   }
@@ -121,7 +122,7 @@ async function updateAccount(acc, values) {
   if(validator.isLength(values.alias, { min: 5, max: 15 })){
     var searchAliasAccount = await clientmongo.db("apibank").collection("cuentas").find({alias: values.alias}).toArray();
     if(searchAliasAccount && searchAliasAccount.length > 0){
-      return 0
+      return 3
     }
     await clientmongo.db("apibank").collection("cuentas").updateOne({ account_id: account[0].account_id }, { $set: { alias: values.alias }}).then(res => {
       console.log(chalk.green(`Se modificó ${res.modifiedCount} registro`));
@@ -136,12 +137,15 @@ async function updateAccount(acc, values) {
 
 
 async function deleteAccount(accountId) {
+  console.log(accountId)
   var clientmongo = await db.getConnection();
   var account = await clientmongo
     .db("apibank")
     .collection("cuentas")
-    .find({ person_id: parseInt(accountId) })
+    .find({ account_id: parseInt(accountId) })
     .toArray();
+
+    console.log(account[0])
 
     if(account && account.length !== 1){
       return 1
@@ -149,14 +153,7 @@ async function deleteAccount(accountId) {
 
     if(account[0].balance === 0){
       await clientmongo.db("apibank").collection("cuentas").deleteOne(account[0])
-      .then((res) => {
-        console.log(chalk.green("Se ha eliminado la cuenta: ", res));
-        return 3
-      })
-      .catch((err) => {
-        chalk.red("No se logro eliminar la cuenta ", err);
-        return 2
-      });
+      return 3
     }else{
       return 2
     }
