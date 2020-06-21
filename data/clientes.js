@@ -58,6 +58,10 @@ async function newClient(values) {
   }
 
   if (
+    typeof values.name !== "string" ||
+    typeof values.address !== "string" ||
+    typeof values.password !== "string" ||
+    typeof values.email !== "string" ||
     validator.isEmpty(values.name) ||
     values.person_id < 0 ||
     values.salary < 0 ||

@@ -41,7 +41,7 @@ async function newAccount(dni, values) {
     return 1;
   }
   if (
-    (values.type === "CA" || values.type === "CC") &&
+    (values.type === "CA" || values.type === "CC") && typeof values.type === "string" &&
     validator.isLength(values.alias, { min: 5, max: 15 })
   ) {
     var auxAccount = await clientmongo
