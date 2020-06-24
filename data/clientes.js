@@ -213,22 +213,13 @@ async function deleteClient(dni) {
       await clientmongo
         .db("apibank")
         .collection("cuentas")
-        .deleteOne({ account_id: element })
+        .deleteOne({ account_id: element });
     }
   }
 
-  await clientmongo
-    .db("apibank")
-    .collection("clientes")
-    .deleteOne(client[0])
-    .then((res) => {
-      console.log(chalk.green("Se ha eliminado el cliente: ", res));
-      return 3;
-    })
-    .catch((err) => {
-      chalk.red("No se logro eliminar el cliente ", err);
-      return 2;
-    });
+  await clientmongo.db("apibank").collection("clientes").deleteOne(client[0]);
+
+  return 3
 }
 
 module.exports = {

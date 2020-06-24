@@ -145,8 +145,6 @@ async function deleteAccount(accountId) {
     .find({ account_id: parseInt(accountId) })
     .toArray();
 
-    console.log(account[0])
-
     if(account && account.length !== 1){
       return 1
     }
