@@ -7,7 +7,7 @@ var bodyParser = require("body-parser");
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-//agregados ->
+//rutas de las apis expuestas ->
 var clientesRouter = require('./routes/clientes');
 var cuentasRouter = require('./routes/cuentas');
 var creditosRouter = require('./routes/creditos');
@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 
-//agregados ->
+//rutas agregadas para dar visibilidad a la api ->
 app.use('/api/clientes', clientesRouter);
 app.use('/api/cuentas', cuentasRouter);
 app.use('/api/creditos', creditosRouter);

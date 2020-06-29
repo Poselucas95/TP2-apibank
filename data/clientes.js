@@ -64,6 +64,7 @@ async function newClient(values) {
     return 3;
   }
 
+  //validamos si el clientes esta en la coleccion
   var clientmongo = await db.getConnection();
   var cli = await clientmongo
     .db("apibank")
@@ -74,7 +75,7 @@ async function newClient(values) {
   if (cli.length > 0) {
     return 2;
   }
-
+  // validaciones de datos
   if (!validator.isEmail(values.email)) {
     return 4;
   }
@@ -85,6 +86,7 @@ async function newClient(values) {
     return 6;
   }
 
+  //buscamos id del ultimo cliente
   var clientId = await clientmongo
     .db("apibank")
     .collection("cli_id")
@@ -93,9 +95,11 @@ async function newClient(values) {
     .limit(1)
     .toArray();
 
+  // encriptamos pass
   const salt = bcrypt.genSaltSync(saltRounds);
   const hash = bcrypt.hashSync(values.password, salt);
 
+  // insertamos el nuevo cliente
   await clientmongo
     .db("apibank")
     .collection("clientes")
@@ -119,6 +123,7 @@ async function newClient(values) {
       return -1;
     });
 
+  // insertamos id en tabla perpetua
   await clientmongo
     .db("apibank")
     .collection("cli_id")
@@ -163,6 +168,7 @@ async function updateClient(dni, values) {
     updateObject.password = hash;
   }
 
+  // inserto actualizaciones
   await clientmongo
     .db("apibank")
     .collection("clientes")
@@ -174,6 +180,7 @@ async function updateClient(dni, values) {
       chalk.red("No se logro editar al cliente", err);
     });
 
+  // muestro resultado
   var newUpdateClient = await clientmongo
     .db("apibank")
     .collection("clientes")
@@ -195,6 +202,7 @@ async function deleteClient(dni) {
     return 1;
   }
 
+  // Validamos que las cuentas esten en cero
   if (client[0].accounts) {
     for (const element of client[0].accounts) {
       var acc = await clientmongo
@@ -209,6 +217,7 @@ async function deleteClient(dni) {
       }
     }
 
+    // Borramos las cuentas del cliente de la coleccion de cuentas (cuentas en cero)
     for (const element of client[0].accounts) {
       await clientmongo
         .db("apibank")
@@ -217,6 +226,7 @@ async function deleteClient(dni) {
     }
   }
 
+  // Borramos el cliente de la coleccion de clientes
   await clientmongo.db("apibank").collection("clientes").deleteOne(client[0]);
 
   return 3

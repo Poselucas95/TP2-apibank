@@ -4,6 +4,7 @@ const validator = require("validator").default;
 const chalk = require("chalk");
 
 async function newDebit(alias, values) {
+  //validamos los datos del moviento
   if (
     !values.reason || typeof values.reason !== "string" ||
     validator.isEmpty(values.reason) ||
@@ -14,6 +15,8 @@ async function newDebit(alias, values) {
   if (!values.amount || values.amount < 0) {
     return 3;
   }
+
+  //validamos que el alias/cuenta exista
   var clientmongo = await db.getConnection();
   var account = await clientmongo
     .db("apibank")
@@ -25,10 +28,12 @@ async function newDebit(alias, values) {
     return 1;
   }
 
+  //validamos que la transaccion no supere el limite de credito de la cuenta
   if(account[0] && account[0].balance + account[0].limit - values.amount < 0){
       return 4
   }
 
+  // preparamos la transaccion a insertar
   var objectToPost = {
     date: new Date(),
     origin: "api",
@@ -38,11 +43,14 @@ async function newDebit(alias, values) {
     reason: values.reason,
   };
 
+  //traigo las transacciones de la cuenta
   var accountTransaction = await clientmongo
     .db("apibank")
     .collection("transacciones")
-    .find({ account_id: parseInt(account[0].account_id) }).toArray();
+    .find({ account_id: parseInt(account[0].account_id) })
+    .toArray();
 
+  //actualizo el array de transacciones y el count de movimientos
   await clientmongo
     .db("apibank")
     .collection("transacciones")
@@ -56,6 +64,7 @@ async function newDebit(alias, values) {
       }
     );
 
+  // actualizo saldo de la cuenta
   await clientmongo
     .db("apibank")
     .collection("cuentas")

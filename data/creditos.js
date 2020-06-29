@@ -4,6 +4,7 @@ const validator = require("validator").default;
 const chalk = require("chalk");
 
 async function newCredit(alias, values) {
+  //validamos los datos del movimiento
   if (
     !values.reason ||
     typeof values.reason !== "string" ||
@@ -16,6 +17,7 @@ async function newCredit(alias, values) {
     return 3;
   }
 
+  //validamos que el alias/cuenta exista
   var clientmongo = await db.getConnection();
   var account = await clientmongo
     .db("apibank")
@@ -27,6 +29,7 @@ async function newCredit(alias, values) {
     return 1;
   }
 
+  // preparamos la transaccion a insertar
   var objectToPost = {
     date: new Date(),
     origin: "api",
@@ -36,12 +39,14 @@ async function newCredit(alias, values) {
     reason: values.reason,
   };
 
+  //traigo las transacciones de la cuenta
   var accountTransaction = await clientmongo
     .db("apibank")
     .collection("transacciones")
     .find({ account_id: parseInt(account[0].account_id) })
     .toArray();
 
+  //actualizo el array de transacciones y el count de movimientos
   console.log(accountTransaction[0]);
   await clientmongo
     .db("apibank")
@@ -56,6 +61,7 @@ async function newCredit(alias, values) {
       }
     );
 
+  // actualizo saldo de la cuenta
   await clientmongo
     .db("apibank")
     .collection("cuentas")
